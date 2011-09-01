@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title>LSU sports news and links - TigerNews.net</title>
+<link rel="stylesheet" type="text/css" href="static/tigernews.css" />
+</head>
+
+<body> <div id="container">
+<div id="header"><h1>TigerNews.net</h1></div>
+<div id="navigation"><ul><!-- Navigation links will go here -->&nbsp;</ul></div>
+
+<div id="content">
+
+{% if latest_entries %}
+
+	{% regroup latest_entries by published|date:"l, F j, Y" as objects_by_day %} 
+
+    
+        {% for day in objects_by_day %}
+            <h2>{{ day.grouper }}</h2>
+
+            <ul>
+            {% for entry in day.list %}
+		<a href="{{ entry.link }}"><li><div class=title>{{ entry.title }}</div><div class=info>{{ entry.feed }}</div></li></a>
+            {% endfor %}
+            </ul>
+            
+        {% endfor %}
+    
+
+{% else %}
+    <h2>Something bad happened.</h2>
+{% endif %}
+
+</div>
+
+<div id="footer">This site updates every hour or so with the latest LSU headlines from various sources. The design is pretty ugly, but it works.</div>
+
+</div>
+</body>
+</html>
