@@ -1,0 +1,3 @@
+This is a very simple Django app that uses Universal Feed Parser to automatically grab the latest headlines from a site and display them on a page. That's it.
+
+I built it to learn Python/Django and because I like to catch up on certain news feed without clogging up my feed reader.
