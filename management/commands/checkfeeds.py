@@ -14,6 +14,9 @@ class Command(NoArgsCommand):
 	def	handle_noargs(self, **options):
 		for f in Feed.objects.all():
 			
+			duplicate_entries = 0
+			new_entries = 0
+			
 			# Parse feed and add it to dictionary e
 			e = feedparser.parse(f.link)
 			
@@ -61,17 +64,24 @@ class Command(NoArgsCommand):
 					logging.warning("Feed %s does not contain 'link' element" % f)
 					break
 				
+				# Check if the entry exists in the database
+				if Entry.objects.filter(link__exact=e.entries[i].link):
+					duplicate_entries += 1	
+					continue
+
 				# Figure out what to use as the date and time
 				if 'published' in e.feed:
 					g.published = time.strftime("%Y-%m-%d %H:%M",e.entries[i].published_parsed)
+					logging.debug('Published: %s' % g.published)
 				elif 'updated' in e.feed:
 					g.published = time.strftime("%Y-%m-%d %H:%M",e.entries[i].updated_parsed)
+					logging.debug('Published: %s' % g.published)
 				elif 'created' in e.feed:
 					g.published = time.strftime("%Y-%m-%d %H:%M",e.entries[i].created_parsed)
+					logging.debug('Published: %s' % g.published)
 				else:
 					g.published = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-				logging.debug('Published: %s' % g.published)
-				
+					logging.debug('Published: %s' % g.published)
 
 				# Check for summary
 				if 'summary' in e.feed:
@@ -84,7 +94,13 @@ class Command(NoArgsCommand):
 				else:
 					g.entryid = e.entries[i].link
 				logging.debug('Entry ID: %s' % g.entryid)
+				
+				g.feed = f 
 
+				g.save()
+				new_entries += 1
+			
+			logging.debug('%s: %s total entries, %s new, %s duplicate' % ( f, duplicate_entries + new_entries, new_entries, duplicate_entries ))
 
 		#	for i in range(len(e.entries)):
 		#			print e.entries[i].title,
